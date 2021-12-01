@@ -1,0 +1,86 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id         String @id @default(uuid())
+  name       String
+  email      String
+  password   String
+  tipouser   String
+
+
+
+  Publicacao   Publicacao[]
+  Paciente     Paciente[]
+  AddPacient   AddPacient[]
+  SeguirMedico SeguirMedico[]
+  Medico       Medico[]
+  @@map("users")
+}
+
+model Medico {
+  id   String @id @default(uuid())
+  descricao String?
+  
+  user User   @relation(fields: [userId], references: [id])
+
+  userId       String
+  AddPacient   AddPacient[]
+  SeguirMedico SeguirMedico[]
+  @@map("medico")
+}
+
+model Paciente {
+  id   String @id @default(uuid())
+  user User   @relation(fields: [userId], references: [id])
+
+  userId       String
+  AddPacient   AddPacient[]
+  SeguirMedico SeguirMedico[]
+  @@map("paciente")
+}
+
+model Publicacao {
+  id         String   @id @default(uuid())
+  url_image  String?
+  created_at DateTime @default(now())
+  text       String?
+
+  user User @relation(fields: [userId], references: [id])
+
+  userId String
+  @@map("publicacao")
+}
+
+model AddPacient {
+  id       String   @id @default(uuid())
+  user     User     @relation(fields: [userId], references: [id])
+  medico   Medico   @relation(fields: [medicoId], references: [id])
+  paciente Paciente @relation(fields: [pacienteId], references: [id])
+
+  userId     String
+  medicoId   String
+  pacienteId String
+  @@map("mypacient")
+}
+
+model SeguirMedico {
+  id       String   @id @default(uuid())
+  user     User     @relation(fields: [userId], references: [id])
+  medico   Medico   @relation(fields: [medicoId], references: [id])
+  paciente Paciente @relation(fields: [pacienteId], references: [id])
+
+  userId     String
+  medicoId   String
+  pacienteId String
+  @@map("medicosseguidos")
+}
